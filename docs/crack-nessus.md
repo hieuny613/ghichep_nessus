@@ -7,7 +7,7 @@
 ```sh
 sudo rpm -i Nessus-10.2.0-es8.x86_64.rpm
 ```
-- Sau khi cài đặt xong khởi động service 
+- Sau khi cài đặt xong khởi động service  
 ```sh
 sudo service nessusd start
 ```
@@ -17,18 +17,18 @@ sudo firewall-cmd --zone=public --add-port=8834/tcp --permanent
 sudo firewall-cmd --reload
 ```
 - Mở trình duyệt và nhập địa chỉ 
-``https://centos_ip:8834``
+``https://centos_ip:8834``  
 - Chọn **Managed Scanner** và **Continue**    
 ![Managed Scanner](../images/managed-scanner.png)
 - Chọn **Tenable.sc** và **Continue**  
 ![Tenable.sc](../images/tenable.png)
-- Đặt tên người dùng và mật khẩu và **Submit**  
+- Đặt tên người dùng và mật khẩu và **Submit**   
 ![user and password](../images/user-passwd.png)
 - Vào trang cài đặt Nessus.  
 Tại thời điểm này Nessus vẫn chưa có chức năng scanner  
 ![setting](../images/setting.png)
 - Vào trang Nessus bên dưới để lấy mã kích hoạt.   
-[Nessus key](https://www.tenable.com/products/nessus/nessus-essentials)
+https://www.tenable.com/products/nessus/nessus-essentials  
 Tên có thể điền tùy ý, địa chỉ email phải chính xác để nhận mã kích hoạt (Có thể dùng mail 10p để nhận mã)  
 ![Đăng Ký Nessus](../images/dangky-nessus.png)
 ![License](../images/license.png)
@@ -77,7 +77,7 @@ sudo service nessusd restart
 - Lấy phiên bản của plugin hiện tại, mở trang dưới và lưu lại số phiên bản  
 https://plugins.nessus.org/v2/plugins.php  
 
-- Tạo file **plugin_feed_info.inc**
+- Tạo file **plugin_feed_info.inc**  
 ```sh
 vim plugin_feed_info.inc
 ```
@@ -95,7 +95,7 @@ sudo cp /root/plugin_feed_info.inc /opt/nessus/var/nessus/
 ```sh
 sudo rm -rf /opt/nessus/lib/nessus/plugins/plugin_feed_info.inc
 ```
-- Khởi động lại service nessusd
+- Khởi động lại service nessusd  
 ```sh
 sudo service nessusd restart
 ```
@@ -118,7 +118,7 @@ cp /root/plugin_feed_info.inc /opt/nessus/var/nessus/;
 rm -rf /opt/nessus/lib/nessus/plugins/plugin_feed_info.inc;
 service nessusd start;
 ```
-- Ghi crack_nessus.sh vào tập lệnh khởi động hệ thống. Bằng cách này, mỗi khi khởi động lại CentOS, quy trình loại bỏ các hạn chế IP sẽ tự động được thực hiện.
+- Ghi crack_nessus.sh vào tập lệnh khởi động hệ thống. Bằng cách này, mỗi khi khởi động lại CentOS, quy trình loại bỏ các hạn chế IP sẽ tự động được thực hiện.  
 ```sh
 sudo chmod +x  /etc/rc.d/rc.local
 sudo vim  /etc/rc.d/rc.local
@@ -135,14 +135,68 @@ sudo ls /opt/nessus/lib/nessus/plugins | wc -l
 ```
 Trong trường hợp bình thường thu mục này có khoảng trên 145000. Nếu thấp hơn nhiều so với giá trị này làm theo các bước ở bên dưới (bắt buộc phải có thư mục plugin đã sao lưu).  
 ```sh
-service nessusd stop;
-rm -rf /opt/nessus/lib/nessus/plugins
-cp -r ./plugins /opt/nessus/lib/nessus/
-cp /root/plugin_feed_info.inc /opt/nessus/var/nessus/;
-rm -rf /opt/nessus/lib/nessus/plugins/plugin_feed_info.inc;
-service nessusd start;
+sudo service nessusd stop;
+sudo rm -rf /opt/nessus/lib/nessus/plugins
+sudo cp -r ./plugins /opt/nessus/lib/nessus/
+sudo cp ./plugin_feed_info.inc /opt/nessus/var/nessus/;
+sudo rm -rf /opt/nessus/lib/nessus/plugins/plugin_feed_info.inc;
+sudo service nessusd start;
 ```
 - Sau đó mở trình duyệt và truy cập nessus bình thường. (https://centos_ip:8843). Chờ quá trình cập nhật plugin hoàn tất  
+## 4. Cập nhật plugin ##
+Cập nhật plugin nhằm mục đích cập nhật các lỗ hổng mới được phát hiện.  
+Để cập nhật plugin nessus cần lại các bước sau:  
+- Nhận mã kích hoạt Nessus  
+```sh
+sudo /opt/nessus/sbin/nessuscli fetch  --challenge
+```
+- Vào trang Nessus bên dưới để lấy mã kích hoạt.  
+https://www.tenable.com/products/nessus/nessus-essentials  
+Tên có thể điền tùy ý, địa chỉ email phải chính xác để nhận mã kích hoạt (Có thể dùng mail 10p để nhận mã)  
+- Mở trình duyệt truy cập link https://plugins.nessus.org/v2/offline.php nhập mã license nhận từ mail và Challenge code ở phía trên  
+![Kích hoạt Nessus](../images/activer-nessus.png)
+![Kích hoạt Nessus](../images/activer-nessus-2.png)
+- Download plugin mới của Nessus  
+- Cài đặt plugin.  
+```sh
+sudo /opt/nessus/sbin/nessuscli update ./all-2.0.tar.gz
+```
+- Kiểm tra thư mục /opt/nessus/lib/nessus/plugins/ xem có bao nhiêu file  
+```sh
+sudo ls /opt/nessus/lib/nessus/plugins | wc -l
+```
+Nếu không có file nào chạy lại lệnh  
+```sh
+sudo /opt/nessus/sbin/nessuscli update ./all-2.0.tar.gz
+```
+- Sao chép thư mục plugins  
+```sh
+cp -r /opt/nessus/lib/nessus/plugins/ ./
+```
+- Lấy phiên bản của plugin hiện tại, mở trang dưới và lưu lại số phiên bản  
+https://plugins.nessus.org/v2/plugins.php  
+
+- Tạo file **plugin_feed_info.inc**
+```sh
+vim plugin_feed_info.inc
+```
+- Nội dung như sau, và thay số trong nội dung sau bằng số phiên bản vừa lấy  
+```sh
+PLUGIN_SET = "202205310147";
+PLUGIN_FEED = "ProfessionalFeed (Direct)";
+PLUGIN_FEED_TRANSPORT = "Tenable Network Security Lightning";
+```
+- Chạy các lệnh dưới để cập nhật lại plugin và crack 
+```sh
+sudo service nessusd stop;
+sduo rm -rf /opt/nessus/lib/nessus/plugins
+sudo cp -r ./plugins /opt/nessus/lib/nessus/
+sudo cp ./plugin_feed_info.inc /opt/nessus/var/nessus/;
+sudo rm -rf /opt/nessus/lib/nessus/plugins/plugin_feed_info.inc;
+sudo service nessusd start;
+```
+- Sau đó mở trình duyệt và truy cập nessus bình thường. (https://centos_ip:8843). Chờ quá trình cập nhật plugin hoàn tất
+
 
 
 
