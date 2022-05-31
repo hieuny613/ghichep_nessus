@@ -145,7 +145,7 @@ sudo service nessusd start;
 - Sau đó mở trình duyệt và truy cập nessus bình thường. (https://centos_ip:8843). Chờ quá trình cập nhật plugin hoàn tất  
 ## 4. Cập nhật plugin ##
 Cập nhật plugin nhằm mục đích cập nhật các lỗ hổng mới được phát hiện.  
-Để cập nhật plugin nessus cần lại các bước sau:  
+Để cập nhật plugin nessus cần làm lại các bước sau:  
 - Nhận mã kích hoạt Nessus  
 ```sh
 sudo /opt/nessus/sbin/nessuscli fetch  --challenge
